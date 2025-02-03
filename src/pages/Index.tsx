@@ -10,6 +10,10 @@ const Index = () => {
     setChatWindows((prev) => [...prev, { id: Date.now() }]);
   };
 
+  const removeChatWindow = (id: number) => {
+    setChatWindows((prev) => prev.filter(window => window.id !== id));
+  };
+
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="flex items-center justify-between mb-4">
@@ -21,7 +25,10 @@ const Index = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {chatWindows.map((window) => (
-          <ChatWindow key={window.id} />
+          <ChatWindow 
+            key={window.id} 
+            onDelete={() => removeChatWindow(window.id)} 
+          />
         ))}
       </div>
     </div>

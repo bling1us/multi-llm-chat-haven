@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import ModelSelector from "./ModelSelector";
 import Messages from "./Messages";
-import { Settings, Send } from "lucide-react";
+import { Settings, Send, Trash2, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -19,13 +19,21 @@ export type Message = {
   content: string;
 };
 
-const ChatWindow = () => {
+interface ChatWindowProps {
+  onDelete?: () => void;
+}
+
+const ChatWindow = ({ onDelete }: ChatWindowProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [selectedModel, setSelectedModel] = useState("gpt-3.5-turbo");
   const [temperature, setTemperature] = useState(0.7);
   const [maxTokens, setMaxTokens] = useState(500);
+
+  const handleClearChat = () => {
+    setMessages([]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,47 +89,65 @@ const ChatWindow = () => {
           selectedModel={selectedModel}
           onSelect={setSelectedModel}
         />
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Settings className="w-4 h-4" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Model Settings</SheetTitle>
-            </SheetHeader>
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">API Key</label>
-                <Input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Enter API key"
-                />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleClearChat}
+            title="Clear chat"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onDelete}
+            title="Delete chat window"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Settings className="w-4 h-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Model Settings</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">API Key</label>
+                  <Input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="Enter API key"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Temperature: {temperature}</label>
+                  <Slider
+                    value={[temperature]}
+                    onValueChange={([value]) => setTemperature(value)}
+                    max={1}
+                    step={0.1}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Max Tokens: {maxTokens}</label>
+                  <Slider
+                    value={[maxTokens]}
+                    onValueChange={([value]) => setMaxTokens(value)}
+                    max={2000}
+                    step={100}
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Temperature: {temperature}</label>
-                <Slider
-                  value={[temperature]}
-                  onValueChange={([value]) => setTemperature(value)}
-                  max={1}
-                  step={0.1}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Max Tokens: {maxTokens}</label>
-                <Slider
-                  value={[maxTokens]}
-                  onValueChange={([value]) => setMaxTokens(value)}
-                  max={2000}
-                  step={100}
-                />
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
       <Messages messages={messages} className="flex-1 overflow-auto p-4" />
