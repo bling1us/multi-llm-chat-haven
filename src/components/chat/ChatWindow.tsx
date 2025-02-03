@@ -54,7 +54,7 @@ const ChatWindow = () => {
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
-      let assistantMessage = { role: "assistant", content: "" };
+      let assistantMessage: Message = { role: "assistant", content: "" };
 
       while (true) {
         const { done, value } = await reader!.read();
