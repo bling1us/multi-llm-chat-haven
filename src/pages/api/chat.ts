@@ -1,6 +1,7 @@
 import OpenAI from "openai";
-import Anthropic from "@anthropic-ai/sdk";
-import { StreamingTextResponse, OpenAIStream, AnthropicStream } from "ai";
+import { Anthropic } from "@anthropic-ai/sdk";
+import { StreamingTextResponse, experimental_StreamData } from 'ai';
+import { OpenAIStream, AnthropicStream } from 'ai/streams';
 
 export const runtime = "edge";
 
@@ -16,7 +17,8 @@ export async function POST(req: Request) {
       max_tokens: maxTokens,
       stream: true,
     });
-    return new StreamingTextResponse(OpenAIStream(response));
+    const stream = OpenAIStream(response);
+    return new StreamingTextResponse(stream);
   }
 
   if (model.startsWith("claude")) {
@@ -28,7 +30,8 @@ export async function POST(req: Request) {
       max_tokens: maxTokens,
       stream: true,
     });
-    return new StreamingTextResponse(AnthropicStream(response));
+    const stream = AnthropicStream(response);
+    return new StreamingTextResponse(stream);
   }
 
   throw new Error(`Unsupported model: ${model}`);
